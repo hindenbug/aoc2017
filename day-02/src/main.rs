@@ -1,12 +1,11 @@
 use std::fs::File;
-use std::io::{BufReader,BufRead};
+use std::io::{BufRead, BufReader};
 
 fn main() {
     println!("{}", checksum1("input.txt"));
 }
 
 fn checksum1(filename: &str) -> u32 {
-
     let f = BufReader::new(File::open(filename).expect("Cannot open file"));
     let mut checksums: Vec<u32> = Vec::new();
 
@@ -18,9 +17,7 @@ fn checksum1(filename: &str) -> u32 {
         checksums.push(v.iter().max().unwrap() - v.iter().min().unwrap());
     }
 
-    checksums.iter()
-        .fold(0, |acc, &x| acc + x)
-
+    checksums.iter().fold(0, |acc, &x| acc + x)
 }
 
 #[test]
