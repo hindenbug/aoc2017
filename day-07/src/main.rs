@@ -8,7 +8,7 @@ struct Program {
     name: String,
     weight: i32,
     children: Vec<String>,
-    parent: Option<String>
+    parent: Option<String>,
 }
 
 fn main() {
@@ -25,7 +25,10 @@ fn root(input: &str) -> &str {
             let mut program = Program {
                 name: capture[1].to_string(),
                 weight: capture[2].parse().unwrap(),
-                children: capture[4].split(", ").map(|s| s.to_string()).collect::<Vec<_>>(),
+                children: capture[4]
+                    .split(", ")
+                    .map(|s| s.to_string())
+                    .collect::<Vec<_>>(),
                 parent: None,
             };
             programs.insert(program.name.clone(), program);
