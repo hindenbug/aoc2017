@@ -6,6 +6,7 @@ static EXAMPLE: &'static str = include_str!("../example.txt");
 fn main() {
     let input = INPUT;
     println!("{:#?}", part1(input));
+    println!("{:#?}", part2(input));
 }
 
 #[derive(Debug)]
@@ -116,6 +117,48 @@ fn part1(input: &str) -> i32 {
 
     let max = registers.iter().max_by_key(|x| x.1).unwrap();
     *max.1
+}
+
+fn part2(input: &str) -> i32 {
+    let mut highest = 0;
+
+    let instructions = input
+        .lines()
+        .map(|i| Instruction::from(i))
+        .collect::<Vec<Instruction>>();
+
+    let mut registers = HashMap::new();
+
+    instructions.iter().for_each(|i| {
+        let old = *registers
+            .entry(i.condition.register.to_owned())
+            .or_insert(0);
+
+        let cond = match i.condition.operator {
+            Operator::GreaterThan => old > i.condition.value,
+            Operator::EqualTo => old == i.condition.value,
+            Operator::GreaterThanEqualTo => old >= i.condition.value,
+            Operator::LessThan => old < i.condition.value,
+            Operator::LessThanEqualTo => old <= i.condition.value,
+            Operator::NotEqualTo => old != i.condition.value,
+        };
+
+        let reg = *registers.entry(i.register.to_owned()).or_insert(0);
+
+        if cond {
+            let new = match i.operation {
+                Operation::Increment => reg + i.delta,
+                Operation::Decrement => reg - i.delta,
+            };
+
+            registers.insert(i.register.to_owned(), new);
+            if new > highest {
+                highest = new;
+            }
+        }
+    });
+
+    highest
 }
 
 #[test]
