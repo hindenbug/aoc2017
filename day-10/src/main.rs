@@ -3,27 +3,41 @@ static EXAMPLE: &'static str = include_str!("../example.txt");
 
 fn main() {
     let input = INPUT;
-    println!("{:#?}", knot_hash(input));
+    println!("{:#?}", knot_hash(input, 255));
 }
 
-fn knot_hash(input: &str) -> u32 {
-    let lengths = input.trim().split(",").map(|x| x.parse::<u8>().unwrap()).collect::<Vec<u8>>();
+fn knot_hash(input: &str, size: usize) -> usize {
+    let lengths = input
+        .trim()
+        .split(",")
+        .map(|x| x.parse::<usize>().unwrap())
+        .collect::<Vec<_>>();
     let (mut current_pos, mut skip_size) = (0, 0);
-    let mut list = (0..256).map(|x| x as u8).collect::<Vec<u8>>();
+    let mut list = (0..size + 1).collect::<Vec<_>>();
 
-    for length in lengths {
-        let mut new_list = Vec::new();
-        let (mut head, mut tail) = list.split_at_mut(current_pos);
+    for len in lengths {
+        let mut sub_list = list.iter()
+            .cloned()
+            .cycle()
+            .skip(current_pos)
+            .take(len)
+            .collect::<Vec<_>>();
 
-        //tail[current_pos as usize..length as usize];
-        current_pos += length as usize + skip_size;
-        skip_size += 1
+        sub_list.reverse();
+
+        for (i, value) in sub_list.iter().enumerate() {
+            let index = (current_pos + i) % list.len();
+            list[index] = *value;
+        }
+
+        current_pos = current_pos + len + skip_size;
+        skip_size += 1;
     }
 
-    12
+    list[0] * list[1]
 }
 
 #[test]
 fn knot_hash_test() {
-    assert_eq!(knot_hash(EXAMPLE), 12)
+    assert_eq!(knot_hash(EXAMPLE, 4), 12)
 }
