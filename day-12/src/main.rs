@@ -9,21 +9,43 @@ fn main() {
 }
 
 fn part1(input: &str) -> u32 {
-    let inputs = input.trim().split(" <-> ").collect::<Vec<&str>>();
+    let inputs = input
+        .trim()
+        .lines()
+        .map(|line| line.split(" <-> ").collect::<Vec<&str>>())
+        .collect::<Vec<_>>();
 
-    let mut m = for data in inputs.iter() {
-        let program = data[0].parse::<u32>().unwrap();
-        let connections = data[1]
-            .split(", ")
-            .map(|d| d.parse::<u32>().unwrap())
-            .collect::<Vec<_>>();
+    let m = inputs
+        .iter()
+        .map(|data| {
+            let program = data[0].parse::<u32>().unwrap();
+            let connections = data[1]
+                .split(", ")
+                .map(|d| d.parse::<u32>().unwrap())
+                .collect::<Vec<_>>();
+            (program, connections)
+        })
+        .collect::<HashMap<u32, Vec<u32>>>();
 
-        (program, connections)
-    }.collect::<HashMap<u32, Vec<u32>>>();
+    let mut result = HashSet::new();
 
-    // WIP
+    result.insert(0);
+    connected_children_of(0, &m, &mut result);
 
-    6
+    result.len() as u32
+}
+
+fn connected_children_of(
+    program: u32,
+    input: &HashMap<u32, Vec<u32>>,
+    mut result: &mut HashSet<u32>,
+) {
+    for c in input[&program].iter() {
+        if !result.contains(c) {
+            result.insert(*c);
+            connected_children_of(*c, input, &mut result);
+        }
+    }
 }
 
 #[test]
