@@ -8,7 +8,7 @@ fn main() {
     println!("{:?}", part1(INPUT));
 }
 
-fn part1(input: &str) -> u32 {
+fn part1(input: &str) -> (u32, u32) {
     let inputs = input
         .trim()
         .lines()
@@ -28,11 +28,22 @@ fn part1(input: &str) -> u32 {
         .collect::<HashMap<u32, Vec<u32>>>();
 
     let mut result = HashSet::new();
-
     result.insert(0);
-    connected_children_of(0, &m, &mut result);
 
-    result.len() as u32
+    connected_children_of(0, &m, &mut result);
+    let count = result.len() as u32;
+
+    let mut groups = 1;
+
+    for key in m.keys() {
+        if result.contains(key) {
+            continue;
+        }
+        connected_children_of(*key, &m, &mut result);
+        groups += 1;
+    }
+
+    (count, groups)
 }
 
 fn connected_children_of(
