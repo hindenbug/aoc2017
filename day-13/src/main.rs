@@ -4,26 +4,31 @@ static INPUT: &'static str = include_str!("../input.txt");
 static EXAMPLE: &'static str = include_str!("../example.txt");
 
 fn main() {
-    println!("#{:?}", part1(EXAMPLE));
+    println!("{:?}", part1(INPUT));
 }
 
-fn part1(input: &str) -> usize {
-    let details = input.lines()
+fn part1(input: &str) -> u32 {
+    let mut severity = 0;
+
+    let details: HashMap<u32, u32> = input
+        .lines()
         .map(|line| {
-            line.split(": ")
-                .map(|x| x.parse::<usize>().unwrap());
-
+            let pts: Vec<_> = line.split(": ").collect();
+            (
+                pts[0].parse::<u32>().unwrap(),
+                pts[1].parse::<u32>().unwrap(),
+            )
         })
-        .collect::<Vec<_>>();
+        .collect();
 
-    for detail in details.into_iter() {
-        detail
+    for (index, depth) in details.iter() {
+        if *depth == 1 || (index % (depth * 2 - 2)) == 0 {
+            severity += *index * *depth
+        }
     }
 
-    println!("{:?}", details);
-    24
+    severity
 }
-
 
 #[test]
 
